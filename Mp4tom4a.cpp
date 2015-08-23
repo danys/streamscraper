@@ -299,7 +299,11 @@ void Mp4tom4a::extract(char* mp4file, char* outfile, unsigned int starttime, uns
                 if (boxpointer != NULL)
                 {
                     //cout << "TRAK Box was found at byte = " << boxpointer-memblock+1 << endl;
+<<<<<<< HEAD
                     //trakboxpointer = boxpointer;
+=======
+                    trakboxpointer = boxpointer;
+>>>>>>> 454b8c290a69c0ca3771030696a25a2a7c8bc999
                     boxpointer = seekbox(boxpointer+8,'m','d','i','a',1); //point to next box inside moov box
                     if (boxpointer != NULL)
                     {
@@ -855,8 +859,13 @@ void Mp4tom4a::extract(char* mp4file, char* outfile, unsigned int starttime, uns
                                             //if std file exists try appending (1), then (2),...
                                             while(true)
                                             {
+<<<<<<< HEAD
                                                 ifstream inputFile(outfile);
                                                 if (!inputFile.good())
+=======
+                                                ifstream inputFile(outfile); // returns true if file exists else false
+                                                if (inputFile == false)
+>>>>>>> 454b8c290a69c0ca3771030696a25a2a7c8bc999
                                                 {
                                                     inputFile.close();
                                                     break; //file doesn't exist break, we have a name
