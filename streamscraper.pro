@@ -12,7 +12,7 @@ TARGET = streamscraper
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES += main.cpp \
     AudioExtractor.cpp \
     AudioFile.cpp \
     Downloader.cpp \
@@ -25,7 +25,7 @@ SOURCES += main.cpp\
     Mp4tom4a.cpp \
     yload.cpp
 
-HEADERS  += main.h \
+HEADERS  += \
     AudioExtractor.h \
     AudioFile.h \
     Downloader.h \
