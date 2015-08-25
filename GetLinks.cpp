@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 GetLinks::GetLinks()
 {
 }
@@ -225,6 +226,7 @@ QString GetLinks::between(QString str,QString from,QString to)
     return res;
 }
 
+//The main function of the class which parses the downloaded file for video links
 void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
 {
  QFile *webfile = new QFile(file);
