@@ -461,7 +461,7 @@ QString yLoad::youtubeInfoUrlFromURL(QString url)
             {
                 res.truncate(stopindex);
             }
-            res = "http://www.youtube.com/get_video_info?video_id="+res+"&asv=3&el=detailpage&hl=en_US&sts=16136";
+            res = "http://www.youtube.com/get_video_info?video_id="+res+"&asv=3&el=detailpage&hl=en_US";
         }
     }
     return res;

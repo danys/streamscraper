@@ -38,7 +38,7 @@ HEADERS  += \
     Mp4tom4a.h \
     yload.h
 
-FORMS    += main.ui \
+FORMS    += \
     yload.ui
 
 DISTFILES += \
