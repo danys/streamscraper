@@ -236,19 +236,11 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  links.insert(1,nullstring);
  if (!webfile->open(QIODevice::ReadOnly|QIODevice::Text))
    return; //reading failed
- //int size = webfile->size();
- //QByteArray *data = new QByteArray();
  QByteArray data = webfile->readAll();
  webfile->close();
  QString andstr = QString("&");
- //char fmt1[] = "url_encoded_fmt_stream_map=";
  QString fmt1("url_encoded_fmt_stream_map=");
- QString fmt2("fmt_stream_map\": \"");
- //char fmt2[] = "fmt_stream_map\": \"";
- //char* andstrp = &andstr;
- //char* fmt1p = fmt1;
- //char* fmt2p = fmt2;
- //int start = 0;
+ QString fmt2("adaptive_fmts=");
  QString linkdata = QString::fromUtf8(data.data());
  //get the title
  QString vtitle;//("Title");
