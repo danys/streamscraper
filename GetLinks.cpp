@@ -242,41 +242,56 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  QString fmt1("url_encoded_fmt_stream_map=");
  QString fmt2("adaptive_fmts=");
  QString linkdata = QString::fromUtf8(data.data());
- //get the title
- QString vtitle;//("Title");
- //char titlea[] = "&title=";
- //char* titleap = titlea;
- QString titlestr("&title=");
- vtitle = between(linkdata,titlestr,andstr);
- vtitle = unescape(vtitle);
- vtitle = vtitle.replace(QString("+"),QString(" "));
- vtitle = vtitle.replace(QString("\\/"),QString("_"));
- vtitle = vtitle.replace(QString("\""),QString(""));
- title = vtitle;
- cleanstr(title);
- //end get the title
-
- //int semicolon;
- //if (data->contains(fmt1))
- if (linkdata.contains(fmt1))
+ QString urlmap = between(linkdata,fmt1,andstr);
+ urlmap.append(",");
+ urlmap.append(between(linkdata,fmt2,andstr));
+ if (urlmap.isEmpty()) return; //no links have been found => terminate early
+ urlmap = unescape(urlmap);
+ QStringList urlDataList = urlmap.split(",",QString::SkipEmptyParts);
+ //Get the title
+ QString vtitle = between(linkdata,"title=","&");
+ //Loop over all urls of this video
+ QList<String> urlList;
+ QString url,s,sig,signature,currentItem;
+ for(int i=0;i<urlDataList.size();i++)
  {
-  //extract the links in url_encoded_fmt_stream_map=<bla bla bla>&;
-     linkdata = between(linkdata,fmt1,andstr);
+     currentItem = urlDataList.at(i);
+    //extract main part of the url
+    url = between(currentItem,"url=","&");
+    url.append("&title=");
+    url.append(vtitle);
+    //extract signature
+    //the signature can be found under the key "sig", "s" or "signature"
+    sig = between(currentItem,"sig","&");
+    if ((!sig.isNull()) &&  (!sig.isEmpty()))
+    {
+        url.append("signature=");
+        url.append(sig);
+    }
+    else
+    {
+        //check if "signature" can be found
+        signature = between(currentItem,"signature","&");
+        if ((!signature.isNull()) && (!signature.isEmpty()))
+        {
+            url.append("signature=");
+            url.append(signature);
+        }
+        else
+        {
+            //check if "s" can be found. The "s" value is encrypted
+            //TODO
+        }
+    }
+    urlList.append(url);
  }
-  //else if (data->contains(fmt2)) //try second method if first one fails to extract the links
-  else if (linkdata.contains(fmt2))
-  {
-      linkdata = between(linkdata,fmt2,andstr);
-      linkdata.replace(QString("\\/"),QString("/"));
-  }
-  if (linkdata.isEmpty()) return; //exit if link data is not found
-
-  linkdata = unescape(linkdata); //debug don't unescape
-  //linkdata is now unescaped ;)
-
-  // OK we now have commas between links;)
-  //links.insert(0,linkdata); //line used to get test output
-  QList<QString> linklist = linkdata.split(',');
+ title = unescape(vtitle);
+ //remove unwanted characters from the title
+ title = title.replace(QString("+"),QString(" "));
+ title = title.replace(QString("\\/"),QString("_"));
+ title = title.replace(QString("\""),QString(""));
+ cleanstr(title);
+ //TODO
   //int itagindex;
   //itags for the FLV links
   //QString itag34("itag=34"); //medium quality

@@ -804,7 +804,7 @@ void yLoad::dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,b
         getit = 0;
         //check if link has been found
         /*if (links.at(0).isEmpty()==true)
-
+        {
             //DownloadInfoBox* box;
             box = yLoad::getDownloadInfoBox(top,slot);
             box->setStatusInformation(4);
