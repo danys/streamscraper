@@ -251,7 +251,7 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  //Get the title
  QString vtitle = between(linkdata,"title=","&");
  //Loop over all urls of this video
- QList<String> urlList;
+ QList<QString> urlList;
  QString url,s,sig,signature,currentItem;
  for(int i=0;i<urlDataList.size();i++)
  {
@@ -291,75 +291,35 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  title = title.replace(QString("\\/"),QString("_"));
  title = title.replace(QString("\""),QString(""));
  cleanstr(title);
- //TODO
-  //int itagindex;
-  //itags for the FLV links
-  //QString itag34("itag=34"); //medium quality
-  //QString itag35("itag=35"); //high quality
-  //itags for the MP4 links
-  QString itag22("itag=22"); //HD quality 720p
-  QString itag37("itag=37"); //HD quality 1080p
-  QString itag84("itag=84"); //HD quality 720p
-  QString itag85("itag=85"); //HD quality 520p
-  //QString itag18("itag=18"); //HD quality 480p
-  QString link("");
-  QString olink("");
-  QList<QString> alllinks;
-  for (int i=0;i<=5;i++) //5 = number of links to be stored
-  {
-      //link = linklist.at(0);
-      alllinks.insert(i,link); //insert anything in order to have element in list, later replace
-  }
-  //char url[] = "url=";
-  //char* urlp = url;
-  QString url("url=");
-  //QString title("Title");
-  //get title and insert title
-  vtitle = escape(vtitle);
-  //vtitle = escape(vtitle); //UNDO TODO
-  //uridecodecomponent(vtitle) TODO
-  int i=0; // use counter from earlier loop, initialize
-  while (i<linklist.length())
-  {
-   olink = linklist.at(i); //original link
-   //link = between(olink,url,QString("&quality"));
-   link = between(olink,url,andstr);
-   //start = link.indexOf(url);
-   //link = link.mid(start+url.length(),-1); //discard info at left side of and including url=
-   //semicolon = link.indexOf('&');
-   //link.truncate(semicolon+1); //discard info after &
-   link = unescape(link); //unescape
-   link = link.append(QString("&title="));
-   link = link.append(vtitle);
-   //end insert title
-   //insert signature if necessary
-   if (!link.contains(QString("signature=")))
-   {
-       //char siga[] = "sig=";
-       //char* sigap = siga;
-       QString siga("sig=");
-       QString sig = between(olink,siga,andstr);
-       link.append("&signature=");
-       link.append(sig);
-   }
-   //end insert signature
-   //cout << "Video link = " << link.toUtf8().data() << endl; //debug
-   //look for itag=34 ==> medium quality FLV & itag=35 ==> high quality FLV
-      if (link.contains(itag22)==true) alllinks.replace(0,link);
-      else if (link.contains(itag37)==true) alllinks.replace(1,link);
-      else if (link.contains(itag85)==true) alllinks.replace(2,link);
-      else if (link.contains(itag84)==true) alllinks.replace(3,link);
-      //else if (link.contains(itag18)==true) alllinks.replace(4,link);
-   i++;
-  }
-  //insert videolink into links.at(0) and flvlink into links.at(1)
-  //insert best quality video link at 0
-  //look into 1->0->3->2 (video)
-  //look into 0->1 (mp4 for audio)
-  if (alllinks.at(1).isEmpty() == false) links.replace(0,alllinks.at(1));
-  else if (alllinks.at(0).isEmpty() == false) links.replace(0,alllinks.at(0));
-  else if (alllinks.at(3).isEmpty() == false) links.replace(0,alllinks.at(3));
-  else if (alllinks.at(2).isEmpty() == false) links.replace(0,alllinks.at(2));
-  if (alllinks.at(0).isEmpty() == false) links.replace(1,alllinks.at(0));
-  else if (alllinks.at(1).isEmpty() == false) links.replace(1,alllinks.at(1));
+ if (urlList.size()==0) return;
+ //itags for the FLV links
+ //QString itag34("itag=34"); //medium quality
+ //QString itag35("itag=35"); //high quality
+ //itags for the MP4 links
+ QString itag22("itag=22"); //HD quality 720p
+ QString itag37("itag=37"); //HD quality 1080p
+ QString itag84("itag=84"); //HD quality 720p
+ QString itag85("itag=85"); //HD quality 520p
+ //QString itag18("itag=18"); //HD quality 480p
+ QString link;
+ int tablelen = 4;
+ bool table[tablelen];
+ for(int i=0;i<tablelen;i++) table[i]=false;
+ for(int i=0;i<urlList.size();i++)
+ {
+     //check for itags
+     link = urlList.at(i);
+     if (link.contains(itag22)) table[0]=true;
+     else if (link.contains(itag37)) table[1]=true;
+     else if (link.contains(itag84)) table[2]=true;
+     else if (link.contains(itag85)) table[3]=true;
+ }
+ //look into 1->0->3->2 (video)
+ //look into 0->1 (mp4 for audio)
+ if (!table[1]) links.replace(0,urlList.at(1));
+ else if (!table[0]) links.replace(0,urlList.at(0));
+ else if (!table[3]) links.replace(0,urlList.at(3));
+ else if (!table[2]) links.replace(0,urlList.at(2));
+ if (!table[0]) links.replace(1,urlList.at(0));
+ else if (!table[1]) links.replace(1,urlList.at(1));
 }
