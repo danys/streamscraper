@@ -314,12 +314,15 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
      else if (link.contains(itag84)) table[2]=true;
      else if (link.contains(itag85)) table[3]=true;
  }
- //look into 1->0->3->2 (video)
- //look into 0->1 (mp4 for audio)
+ //look into 1->0->3->2 (video) => video at position 0 in links list
+ //look into 0->1 (mp4 for audio) => audio at position 1 in links list
  if (!table[1]) links.replace(0,urlList.at(1));
  else if (!table[0]) links.replace(0,urlList.at(0));
  else if (!table[3]) links.replace(0,urlList.at(3));
  else if (!table[2]) links.replace(0,urlList.at(2));
  if (!table[0]) links.replace(1,urlList.at(0));
  else if (!table[1]) links.replace(1,urlList.at(1));
+ //If itag cannot be found both links in urlList are empty
+ //select the first link in that case for the video. Leave the audio link empty
+ if ((links.at(0).isEmpty()) && (links.at(1).isEmpty())) links.replace(0,urlList.at(0));
 }
