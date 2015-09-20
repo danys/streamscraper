@@ -257,12 +257,12 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  {
      currentItem = urlDataList.at(i);
     //extract main part of the url
-    url = between(currentItem,"url=","&");
+    url = unescape(between(currentItem,"url=","&"));
     url.append("&title=");
     url.append(vtitle);
     //extract signature
     //the signature can be found under the key "sig", "s" or "signature"
-    sig = between(currentItem,"sig","&");
+    sig = between(currentItem,"sig=","&");
     if ((!sig.isNull()) &&  (!sig.isEmpty()))
     {
         url.append("signature=");
@@ -271,7 +271,7 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
     else
     {
         //check if "signature" can be found
-        signature = between(currentItem,"signature","&");
+        signature = between(currentItem,"signature=","&");
         if ((!signature.isNull()) && (!signature.isEmpty()))
         {
             url.append("signature=");
