@@ -1477,7 +1477,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Author: Dany Sünnen, Copyright (c) 2010 - 2014</string>
+      <string>Author: Dany Sünnen, Copyright (c) 2010 - 2015</string>
      </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>
@@ -1530,7 +1530,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Version: 1.5.2</string>
+      <string>Version: 1.6</string>
      </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>
