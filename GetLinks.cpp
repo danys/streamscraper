@@ -252,7 +252,7 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  QString vtitle = between(linkdata,"title=","&");
  //Loop over all urls of this video
  QList<QString> urlList;
- QString url,s,sig,signature,currentItem;
+ QString url,s,sig,signature,currentItem,itagkey;
  for(int i=0;i<urlDataList.size();i++)
  {
      currentItem = urlDataList.at(i);
@@ -260,6 +260,16 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
     url = unescape(between(currentItem,"url=","&"));
     url.append("&title=");
     url.append(vtitle);
+    //extract and append itag if itag is not present in URL
+    if (!url.contains("itag="))
+    {
+        itagkey = unescape(between(currentItem,"itag=","&"));
+        if ((!itagkey.isNull()) && (!itagkey.isEmpty()))
+        {
+            url.append("&itag=");
+            url.append(itagkey);
+        }
+    }
     //extract signature
     //the signature can be found under the key "sig", "s" or "signature"
     sig = between(currentItem,"sig=","&");
@@ -300,28 +310,30 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
  QString itag37("itag=37"); //HD quality 1080p
  QString itag84("itag=84"); //HD quality 720p
  QString itag85("itag=85"); //HD quality 520p
- //QString itag18("itag=18"); //HD quality 480p
+ QString itag18("itag=18"); //HD quality 480p
  QString link;
- int tablelen = 4;
- bool table[tablelen];
- for(int i=0;i<tablelen;i++) table[i]=false;
+ int tablelen = 5;
+ int table[tablelen];
+ for(int i=0;i<tablelen;i++) table[i]=-1;
  for(int i=0;i<urlList.size();i++)
  {
      //check for itags
      link = urlList.at(i);
-     if (link.contains(itag22)) table[0]=true;
-     else if (link.contains(itag37)) table[1]=true;
-     else if (link.contains(itag84)) table[2]=true;
-     else if (link.contains(itag85)) table[3]=true;
+     if (link.contains(itag22)) table[0]=i;
+     else if (link.contains(itag37)) table[1]=i;
+     else if (link.contains(itag84)) table[2]=i;
+     else if (link.contains(itag85)) table[3]=i;
+     else if (link.contains(itag18)) table[4]=i;
  }
  //look into 1->0->3->2 (video) => video at position 0 in links list
- //look into 0->1 (mp4 for audio) => audio at position 1 in links list
- if (!table[1]) links.replace(0,urlList.at(1));
- else if (!table[0]) links.replace(0,urlList.at(0));
- else if (!table[3]) links.replace(0,urlList.at(3));
- else if (!table[2]) links.replace(0,urlList.at(2));
- if (!table[0]) links.replace(1,urlList.at(0));
- else if (!table[1]) links.replace(1,urlList.at(1));
+ //look into 0->1->4 (mp4 for audio) => audio at position 1 in links list
+ if (table[1]!=-1) links.replace(0,urlList.at(table[1]));
+ else if (table[0]!=-1) links.replace(0,urlList.at(table[0]));
+ else if (table[3]!=-1) links.replace(0,urlList.at(table[3]));
+ else if (table[2]!=-1) links.replace(0,urlList.at(table[2]));
+ if (table[0]!=-1) links.replace(1,urlList.at(table[0]));
+ else if (table[1]!=-1) links.replace(1,urlList.at(table[1]));
+ else if (table[4]!=-1) links.replace(1,urlList.at(table[4]));
  //If itag cannot be found both links in urlList are empty
  //select the first link in that case for the video. Leave the audio link empty
  if ((links.at(0).isEmpty()) && (links.at(1).isEmpty())) links.replace(0,urlList.at(0));
