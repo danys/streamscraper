@@ -29,6 +29,7 @@ class Downloader: public QObject
    QNetworkReply* reply10;
    QList<QFile*> responseFile;
    QList<QUrl*> url;
+   QList<QString*> videoUrls;
    QUrl* lasturl;
    //
    bool cancel[10];
@@ -55,7 +56,7 @@ class Downloader: public QObject
    Downloader(); //constructor, audiodata is the audiodatasize
    ~Downloader(); //destructor
 
-   bool DownloadtoFile(QUrl* fileurl,QFile* file, bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int stateinfo);
+   bool DownloadtoFile(QUrl* fileurl,QFile* file, bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int stateinfo, QString* videoURL);
    int getnextfreeslot();
    //decrement download: used by external caller to decrement #concurrent downloads and free download slot synchronously
    void decrement(int downloadslot);
@@ -111,16 +112,16 @@ class Downloader: public QObject
 
  signals:
      // notify when download finishes, int slot is between 0 and 9
-     void dlfinit1(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit2(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit3(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit4(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit5(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit6(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit7(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit8(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit9(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
-     void dlfinit10(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
+     void dlfinit1(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit2(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit3(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit4(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit5(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit6(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit7(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit8(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit9(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
+     void dlfinit10(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
      // notify progress
      void dlprogress1(qint64 bytesRead, qint64 totalBytes);
      void dlprogress2(qint64 bytesRead, qint64 totalBytes);

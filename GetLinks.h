@@ -18,7 +18,8 @@ class GetLinks
    //3=mp4 HD quality
    //4=mp4 HD quality 2nd
    //provided QList must be able to store 5 QStrings
-   void extractlinks(QString file, QList<QString> &links,QString &title);
+   void extractlinks(QString file, QList<QString> &links,QString &title,QString videoUrl);
+   QString download(QString urlString);
    void cleanstr(QString &str);
    QString unescape(QString linkdata);
    QString escape(QString linkdata);

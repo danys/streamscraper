@@ -50,7 +50,7 @@ public slots:
     void d8update(qint64 bytesRead, qint64 totalBytes);
     void d9update(qint64 bytesRead, qint64 totalBytes);
     void d10update(qint64 bytesRead, qint64 totalBytes);
-    void dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot);
+    void dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int cstate,int slot,QString* videoUrl);
 
 private slots:
     void on_cbCut2_clicked();

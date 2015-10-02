@@ -1,7 +1,11 @@
 #include <QWidget>
 #include "GetLinks.h"
 #include <QFile>
+#include <QUrl>
 #include <iostream> //debug
+#include <QNetworkAccessManager>
+#include <QEventLoop>
+#include <QNetworkReply>
 
 using namespace std;
 
@@ -226,8 +230,27 @@ QString GetLinks::between(QString str,QString from,QString to)
     return res;
 }
 
+//Synchronously download a page associated to a given URL String
+QString download(QString urlString)
+{
+    QNetworkAccessManager qnam;
+    QUrl url(urlString);
+    QEventLoop loop;
+    QNetworkReply* reply = qnam.get(QNetworkRequest(url));
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()), Qt::UniqueConnection);
+    loop.exec();
+    if (reply->error()) return NULL;
+    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (!redirectionTarget.isNull())
+    {
+        QUrl newURL = url.resolved(redirectionTarget.toUrl());
+        return download(newURL.toString());
+    }
+    return QString::fromUtf8(reply->readAll());
+}
+
 //The main function of the class which parses the downloaded file for video links
-void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
+void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title, QString videoUrl)
 {
  QFile *webfile = new QFile(file);
  //insert 2 empty strings
@@ -290,7 +313,12 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title)
         else
         {
             //check if "s" can be found. The "s" value is encrypted
-            //TODO
+            QString encryptedSignature = between(currentItem,"s=","&");
+            if ((!encryptedSignature.isNull()) && (!encryptedSignature.isEmpty()))
+            {
+                //fetch the video webpage
+                //QString videopage = download();
+            }
         }
     }
     urlList.append(url);

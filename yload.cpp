@@ -31,7 +31,7 @@ yLoad::yLoad(QWidget *parent) :
     ui->scrollAreaDownloads->setWidget(boxcontainer);
     leVideoLink = new LineEditButton(ui->tab);
     leVideoLink->setObjectName(QString::fromUtf8("leVideoLink"));
-    leVideoLink->setPlaceholderText(QString("http://www.youtube.com/watch?v=IgLcQmlN2Xg"));
+    leVideoLink->setPlaceholderText(QString("https://www.youtube.com/watch?v=IgLcQmlN2Xg"));
     ui->leOutputDir->setPlaceholderText(QString("No folder selected - Using current directory"));
     leVideoLink->setMaxLength(100);
     leVideoLink->setGeometry(100,55,411,30);
@@ -475,7 +475,8 @@ void yLoad::on_pbGet_clicked()
         QMessageBox::warning(this, tr("Warning"), tr("Link field is empty!"), QMessageBox::Ok, QMessageBox::Ok);
         return;
     }
-    if (urlstr.contains("youtu")) urlstr = youtubeInfoUrlFromURL(urlstr);
+    QString infoUrlStr = urlstr;
+    if (urlstr.contains("youtu")) infoUrlStr = youtubeInfoUrlFromURL(urlstr);
     else
     {
         QMessageBox::warning(this, tr("Warning"), tr("Enter a youtube video URL!"), QMessageBox::Ok, QMessageBox::Ok);
@@ -485,7 +486,7 @@ void yLoad::on_pbGet_clicked()
     ui->pbGet->setEnabled(false); //avoids that more than 1 DownloadtoFile() call is executed at once
     folderButton->setEnabled(false); //avoid that dir is changed when info is needed
     //change url here with the youtubeInfoUrlFromURL(QString url) function
-    QUrl *url = new QUrl(urlstr);
+    QUrl *url = new QUrl(infoUrlStr);
     //outputDir.append(QString("/"));
     QString datafile = outputDir;
     datafile.append(QString("data.txt"));
@@ -506,16 +507,16 @@ void yLoad::on_pbGet_clicked()
     connect(pull, SIGNAL(dlprogress9(qint64 , qint64 )),this, SLOT(d9update(qint64,qint64)),Qt::UniqueConnection);
     connect(pull, SIGNAL(dlprogress10(qint64 , qint64 )),this, SLOT(d10update(qint64,qint64)),Qt::UniqueConnection);
     //Create the connections to signal the finish of a download
-    connect(pull, SIGNAL(dlfinit1(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit2(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit3(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit4(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit5(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit6(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit7(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit8(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit9(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
-    connect(pull, SIGNAL(dlfinit10(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit1(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit2(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit3(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit4(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit5(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit6(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit7(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit8(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit9(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
+    connect(pull, SIGNAL(dlfinit10(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),this, SLOT(dfinish(Downloader*,QFile*,bool,bool,bool,int,int,int,int,QString*)),Qt::UniqueConnection);
     //create connection to notify that get button can be enabled
     connect(pull, SIGNAL(criticaldone(QString,int)),this, SLOT(getbuttonenable(QString,int)),Qt::UniqueConnection);
     //set configuration details
@@ -588,7 +589,7 @@ void yLoad::on_pbGet_clicked()
     bool dokeepvid = false;
     if (ui->cbKeep->isChecked() == true) dokeepvid = true;
     //QString* title = new QString("");
-    bool dlsuccess = pull->DownloadtoFile(url,file,getvideo,docut,dokeepvid,starttime,endtime,0);
+    bool dlsuccess = pull->DownloadtoFile(url,file,getvideo,docut,dokeepvid,starttime,endtime,0,new QString(urlstr));
     if (!dlsuccess)
     {
         QMessageBox::warning(this, tr("Warning"), tr("Currently 10 downloads are running at the same time. Wait for one to finish"), QMessageBox::Ok, QMessageBox::Ok);
@@ -780,7 +781,7 @@ void yLoad::d10update(qint64 bytesRead, qint64 totalBytes)
     if (box!=NULL) box->setProgressInformation(bytesRead,totalBytes);
 }
 
-void yLoad::dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime, int cstate, int slot)
+void yLoad::dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime, int cstate, int slot,QString* videoUrl)
 {
     DownloadInfoBox* box;
     if (cstate == 1) //page is downloaded and stored under localfile, pull video or pull video for later conversion into an audio file
@@ -789,7 +790,7 @@ void yLoad::dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,b
         QString* title = new QString("Video"); //set a default name, if no title can be found this one is used; but default is also set in getlinks
         GetLinks* getit = new GetLinks();
         //get links and title
-        getit->extractlinks(localfile->fileName(),links,*title);
+        getit->extractlinks(localfile->fileName(),links,*title,*videoUrl);
         //title->prepend(outputDir);//set title to full path to file
         QString titletemp = outputDir;
         folderButton->setEnabled(true); //outputDir info is saved now button can be enabled again
@@ -803,14 +804,6 @@ void yLoad::dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,b
         delete getit;
         getit = 0;
         //check if link has been found
-        /*if (links.at(0).isEmpty()==true)
-        {
-            //DownloadInfoBox* box;
-            box = yLoad::getDownloadInfoBox(top,slot);
-            box->setStatusInformation(4);
-            //no link found, doesn't matter if getvideo is true or not
-            return;
-        }*/
         QUrl* url;
         if (getvideo == true)
         {
@@ -847,7 +840,7 @@ void yLoad::dfinish(Downloader* down,QFile* localfile,bool getvideo,bool docut,b
         delete title;
         title = 0;
         ui->pbGet->setEnabled(false); //prevent that user hits the "Get" button at the same instant, as soon as critical section of downloader is executed button is enabled again ;)
-        pull->DownloadtoFile(url,file,getvideo,docut,dokeepvid,starttime,endtime,1);
+        pull->DownloadtoFile(url,file,getvideo,docut,dokeepvid,starttime,endtime,1,videoUrl);
     }
     else if (cstate == 2) //video or flv downloaded, convert if flv, actually we do not process flv files anymore ;)
     {
@@ -957,7 +950,7 @@ DownloadInfoBox* yLoad::getFinishedDownloadInfoBox(DownloadInfoBox* top/*,int do
 {
     while (top != NULL)
     {
-        if (/*(top->slot == downloadslot) && */(top->state == 3)) //state 3 means finished, if condition is true ==> reuse slot
+        if (/*(top->slot == downloadslot) && */top->state == 3) //state 3 means finished, if condition is true ==> reuse slot
         {
             return top;
         }

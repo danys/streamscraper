@@ -26,27 +26,11 @@ Downloader::Downloader()
     state[i] = 0;
    }
    // insert 10 QFiles => afterwards just replace them
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
-   responseFile.append(new QFile);
+   for(int i=0;i<maxdownloads;i++) responseFile.append(new QFile);
    // insert 10 QUrls => afterwards just replace them
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
-   url.append(new QUrl);
+   for(int i=0;i<maxdownloads;i++) url.append(new QUrl);
+   // insert 10 QStrings => later only replace them
+   for(int i=0;i<maxdownloads;i++) videoUrls.append(new QString);
 }
 
 Downloader::~Downloader()
@@ -65,7 +49,7 @@ int Downloader::getnextfreeslot()
     return -1;
 }
 
-bool Downloader::DownloadtoFile(QUrl* fileurl,QFile* file, bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int stateinfo)
+bool Downloader::DownloadtoFile(QUrl* fileurl,QFile* file, bool getvideo,bool docut,bool dokeepvid,int starttime,int endtime,int stateinfo, QString* videoUrl)
 {
  if (nconcurrentdownloads < maxdownloads)
  {
@@ -86,6 +70,7 @@ bool Downloader::DownloadtoFile(QUrl* fileurl,QFile* file, bool getvideo,bool do
   state[nextfreeslot] = stateinfo;
   nconcurrentdownloads++;
   isdownloading[nextfreeslot] = 1;
+  videoUrls.replace(nextfreeslot,videoUrl);
   QString label = file->fileName(); //submit filename to yload class to display name in GUI
   emit criticaldone(label,nextfreeslot);
   switch(nextfreeslot)
@@ -252,7 +237,7 @@ void Downloader::downloadwrite1()
    reply1->deleteLater();
    reply1 = 0;
    //responseFile.removeAt(0);
-   emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],4,0); //transmit parameters
+   emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],4,0,videoUrls.at(0)); //transmit parameters
    nconcurrentdownloads--;
    isdownloading[0] = 0;
    return;
@@ -271,7 +256,7 @@ void Downloader::downloadwrite2()
    reply2->deleteLater();
    reply2 = 0;
    //responseFile.removeAt(1);
-   emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],4,1); //transmit parameters
+   emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],4,1,videoUrls.at(1)); //transmit parameters
    return;
   }
   else
@@ -288,7 +273,7 @@ void Downloader::downloadwrite3()
    reply3->deleteLater();
    reply3 = 0;
    //responseFile.removeAt(2);
-   emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],4,2); //transmit parameters
+   emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],4,2,videoUrls.at(2)); //transmit parameters
    return;
   }
   else
@@ -305,7 +290,7 @@ void Downloader::downloadwrite4()
    reply4->deleteLater();
    reply4 = 0;
    //responseFile.removeAt(3);
-   emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],4,3); //transmit parameters
+   emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],4,3,videoUrls.at(3)); //transmit parameters
    return;
   }
   else
@@ -322,7 +307,7 @@ void Downloader::downloadwrite5()
    reply5->deleteLater();
    reply5 = 0;
    //responseFile.removeAt(4);
-   emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],4,4); //transmit parameters
+   emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],4,4,videoUrls.at(4)); //transmit parameters
    return;
   }
   else
@@ -339,7 +324,7 @@ void Downloader::downloadwrite6()
    reply6->deleteLater();
    reply6 = 0;
    //responseFile.removeAt(5);
-   emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],4,5); //transmit parameters
+   emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],4,5,videoUrls.at(5)); //transmit parameters
    return;
   }
   else
@@ -356,7 +341,7 @@ void Downloader::downloadwrite7()
    reply7->deleteLater();
    reply7 = 0;
    //responseFile.removeAt(6);
-   emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],4,6); //transmit parameters
+   emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],4,6,videoUrls.at(6)); //transmit parameters
    return;
   }
   else
@@ -373,7 +358,7 @@ void Downloader::downloadwrite8()
    reply8->deleteLater();
    reply8 = 0;
    //responseFile.removeAt(7);
-   emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],4,7); //transmit parameters
+   emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],4,7,videoUrls.at(7)); //transmit parameters
    return;
   }
   else
@@ -390,7 +375,7 @@ void Downloader::downloadwrite9()
    reply9->deleteLater();
    reply9 = 0;
    //responseFile.removeAt(8);
-   emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],4,8); //transmit parameters
+   emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],4,8,videoUrls.at(8)); //transmit parameters
    return;
   }
   else
@@ -407,7 +392,7 @@ void Downloader::downloadwrite10()
    reply10->deleteLater();
    reply10 = 0;
    //responseFile.removeAt(9);
-   emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],4,9); //transmit parameters
+   emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],4,9,videoUrls.at(9)); //transmit parameters
    return;
   }
   else
@@ -435,7 +420,7 @@ void Downloader::downloaddone1()
         reply1->deleteLater();
         reply1 = 0;
         state[0] = 4; //state means: cancelled
-        emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],state[0],0); //transmit parameters
+        emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],state[0],0,videoUrls.at(0)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[0] = 0;
         //delete url: delete url.at(0)
@@ -451,7 +436,7 @@ void Downloader::downloaddone1()
         reply1 = 0;
         //nconcurrentdownloads--;
         //isdownloading[0] = 0;
-        emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],-1,0); //error is state = -1
+        emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],-1,0,videoUrls.at(0)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull()) //redirect
@@ -464,13 +449,13 @@ void Downloader::downloaddone1()
      reply1 = 0;
      nconcurrentdownloads--;
      isdownloading[0] = 0;
-     DownloadtoFile(url.at(0),responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],state[0]); //state remains unchanged
+     DownloadtoFile(url.at(0),responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],state[0],videoUrls.at(0)); //state remains unchanged
      return;
     } //success :)
     reply1->deleteLater();
     reply1 = 0;
     state[0] = state[0]+1; //state changed
-    emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],state[0],0);
+    emit dlfinit1(this,responseFile.at(0),video[0],cut[0],keepflv[0],start[0],end[0],state[0],0,videoUrls.at(0));
     //nconcurrentdownloads--;
     //isdownloading[0] = 0;
 }
@@ -489,7 +474,7 @@ void Downloader::downloaddone2()
         reply2->deleteLater();
         reply2 = 0;
         state[1] = 4; //state means: cancelled
-        emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],state[1],1); //transmit parameters
+        emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],state[1],1,videoUrls.at(1)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[1] = 0;
         return;
@@ -504,7 +489,7 @@ void Downloader::downloaddone2()
         reply2 = 0;
         //nconcurrentdownloads--;
         //isdownloading[1] = 0;
-        emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],-1,1); //error is state = -1
+        emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],-1,1,videoUrls.at(1)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -517,14 +502,14 @@ void Downloader::downloaddone2()
      reply2 = 0;
      nconcurrentdownloads--;
      isdownloading[1] = 0;
-     DownloadtoFile(url.at(1),responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],state[1]); //state remains unchanged
+     DownloadtoFile(url.at(1),responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],state[1],videoUrls.at(1)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply2->deleteLater();
     reply2 = 0;
     state[1] = state[1]+1; //state changed
-    emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],state[1],1);
+    emit dlfinit2(this,responseFile.at(1),video[1],cut[1],keepflv[1],start[1],end[1],state[1],1,videoUrls.at(1));
     //nconcurrentdownloads--;
     //isdownloading[1] = 0;
 }
@@ -543,7 +528,7 @@ void Downloader::downloaddone3()
         reply3->deleteLater();
         reply3 = 0;
         state[2] = 4; //state means: cancelled
-        emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],state[2],2); //transmit parameters
+        emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],state[2],2,videoUrls.at(2)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[2] = 0;
         return;
@@ -558,7 +543,7 @@ void Downloader::downloaddone3()
         reply3 = 0;
         //nconcurrentdownloads--;
         //isdownloading[2] = 0;
-        emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],-1,2); //error is state = -1
+        emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],-1,2,videoUrls.at(2)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -571,14 +556,14 @@ void Downloader::downloaddone3()
      reply3 = 0;
      nconcurrentdownloads--;
      isdownloading[2] = 0;
-     DownloadtoFile(url.at(2),responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],state[2]); //state remains unchanged
+     DownloadtoFile(url.at(2),responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],state[2],videoUrls.at(2)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply3->deleteLater();
     reply3 = 0;
     state[2] = state[2]+1; //state changed
-    emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],state[2],2);
+    emit dlfinit3(this,responseFile.at(2),video[2],cut[2],keepflv[2],start[2],end[2],state[2],2,videoUrls.at(2));
     //nconcurrentdownloads--;
     //isdownloading[2] = 0;
 }
@@ -597,7 +582,7 @@ void Downloader::downloaddone4()
         reply4->deleteLater();
         reply4 = 0;
         state[3] = 4; //state means: cancelled
-        emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],state[3],3); //transmit parameters
+        emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],state[3],3,videoUrls.at(3)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[3] = 0;
         return;
@@ -612,7 +597,7 @@ void Downloader::downloaddone4()
         reply4 = 0;
         //nconcurrentdownloads--;
         //isdownloading[3] = 0;
-        emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],-1,3); //error is state = -1
+        emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],-1,3,videoUrls.at(3)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -625,14 +610,14 @@ void Downloader::downloaddone4()
      reply4 = 0;
      nconcurrentdownloads--;
      isdownloading[3] = 0;
-     DownloadtoFile(url.at(3),responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],state[3]); //state remains unchanged
+     DownloadtoFile(url.at(3),responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],state[3],videoUrls.at(3)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply4->deleteLater();
     reply4 = 0;
     state[3] = state[3]+1; //state changed
-    emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],state[3],3);
+    emit dlfinit4(this,responseFile.at(3),video[3],cut[3],keepflv[3],start[3],end[3],state[3],3,videoUrls.at(3));
     //nconcurrentdownloads--;
     //isdownloading[3] = 0;
 }
@@ -651,7 +636,7 @@ void Downloader::downloaddone5()
         reply5->deleteLater();
         reply5 = 0;
         state[4] = 4; //state means: cancelled
-        emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],state[4],4); //transmit parameters
+        emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],state[4],4,videoUrls.at(4)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[4] = 0;
         return;
@@ -666,7 +651,7 @@ void Downloader::downloaddone5()
         reply5 = 0;
         //nconcurrentdownloads--;
         //isdownloading[4] = 0;
-        emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],-1,4); //error is state = -1
+        emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],-1,4,videoUrls.at(4)); //error is state = -1
     }
     else if (!redirectionTarget.isNull())
     {
@@ -678,14 +663,14 @@ void Downloader::downloaddone5()
      reply5 = 0;
      nconcurrentdownloads--;
      isdownloading[4] = 0;
-     DownloadtoFile(url.at(4),responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],state[4]); //state remains unchanged
+     DownloadtoFile(url.at(4),responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],state[4],videoUrls.at(4)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply5->deleteLater();
     reply5 = 0;
     state[4] = state[4]+1; //state changed
-    emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],state[4],4);
+    emit dlfinit5(this,responseFile.at(4),video[4],cut[4],keepflv[4],start[4],end[4],state[4],4,videoUrls.at(4));
     //nconcurrentdownloads--;
     //isdownloading[4] = 0;
 }
@@ -704,7 +689,7 @@ void Downloader::downloaddone6()
         reply6->deleteLater();
         reply6 = 0;
         state[5] = 4; //state means: cancelled
-        emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],state[5],5); //transmit parameters
+        emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],state[5],5,videoUrls.at(5)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[5] = 0;
         return;
@@ -719,7 +704,7 @@ void Downloader::downloaddone6()
         reply6 = 0;
         //nconcurrentdownloads--;
         //isdownloading[5] = 0;
-        emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],-1,5); //error is state = -1
+        emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],-1,5,videoUrls.at(5)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -732,14 +717,14 @@ void Downloader::downloaddone6()
      reply6 = 0;
      nconcurrentdownloads--;
      isdownloading[5] = 0;
-     DownloadtoFile(url.at(5),responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],state[5]); //state remains unchanged
+     DownloadtoFile(url.at(5),responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],state[5],videoUrls.at(5)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply6->deleteLater();
     reply6 = 0;
     state[5] = state[5]+1; //state changed
-    emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],state[5],5);
+    emit dlfinit6(this,responseFile.at(5),video[5],cut[5],keepflv[5],start[5],end[5],state[5],5,videoUrls.at(5));
     //nconcurrentdownloads--;
     //isdownloading[5] = 0;
 }
@@ -758,7 +743,7 @@ void Downloader::downloaddone7()
         reply7->deleteLater();
         reply7 = 0;
         state[6] = 4; //state means: cancelled
-        emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],state[6],6); //transmit parameters
+        emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],state[6],6,videoUrls.at(6)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[6] = 0;
         return;
@@ -773,7 +758,7 @@ void Downloader::downloaddone7()
         reply7 = 0;
         //nconcurrentdownloads--;
         //isdownloading[6] = 0;
-        emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],-1,6); //error is state = -1
+        emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],-1,6,videoUrls.at(6)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -786,14 +771,14 @@ void Downloader::downloaddone7()
      reply7 = 0;
      nconcurrentdownloads--;
      isdownloading[6] = 0;
-     DownloadtoFile(url.at(6),responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],state[6]); //state remains unchanged
+     DownloadtoFile(url.at(6),responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],state[6],videoUrls.at(6)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply7->deleteLater();
     reply7 = 0;
     state[6] = state[6]+1; //state changed
-    emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],state[6],6);
+    emit dlfinit7(this,responseFile.at(6),video[6],cut[6],keepflv[6],start[6],end[6],state[6],6,videoUrls.at(6));
     //nconcurrentdownloads--;
     //isdownloading[6] = 0;
 }
@@ -812,7 +797,7 @@ void Downloader::downloaddone8()
         reply8->deleteLater();
         reply8 = 0;
         state[7] = 4; //state means: cancelled
-        emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],state[7],7); //transmit parameters
+        emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],state[7],7,videoUrls.at(7)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[7] = 0;
         return;
@@ -827,7 +812,7 @@ void Downloader::downloaddone8()
         reply8 = 0;
         //nconcurrentdownloads--;
         //isdownloading[7] = 0;
-        emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],-1,7); //error is state = -1
+        emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],-1,7,videoUrls.at(7)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -840,14 +825,14 @@ void Downloader::downloaddone8()
      reply8 = 0;
      nconcurrentdownloads--;
      isdownloading[7] = 0;
-     DownloadtoFile(url.at(7),responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],state[7]); //state remains unchanged
+     DownloadtoFile(url.at(7),responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],state[7],videoUrls.at(7)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply8->deleteLater();
     reply8 = 0;
     state[7] = state[7]+1; //state changed
-    emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],state[7],7);
+    emit dlfinit8(this,responseFile.at(7),video[7],cut[7],keepflv[7],start[7],end[7],state[7],7,videoUrls.at(7));
     //nconcurrentdownloads--;
     //isdownloading[7] = 0;
 }
@@ -866,7 +851,7 @@ void Downloader::downloaddone9()
         reply9->deleteLater();
         reply9 = 0;
         state[8] = 4; //state means: cancelled
-        emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],state[8],8); //transmit parameters
+        emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],state[8],8,videoUrls.at(8)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[8] = 0;
         return;
@@ -881,7 +866,7 @@ void Downloader::downloaddone9()
         reply9 = 0;
         //nconcurrentdownloads--;
         //isdownloading[8] = 0;
-        emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],-1,8); //error is state = -1
+        emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],-1,8,videoUrls.at(8)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -894,14 +879,14 @@ void Downloader::downloaddone9()
      reply9 = 0;
      nconcurrentdownloads--;
      isdownloading[8] = 0;
-     DownloadtoFile(url.at(8),responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],state[8]); //state remains unchanged
+     DownloadtoFile(url.at(8),responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],state[8],videoUrls.at(8)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply9->deleteLater();
     reply9 = 0;
     state[8] = state[8]+1; //state changed
-    emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],state[8],8);
+    emit dlfinit9(this,responseFile.at(8),video[8],cut[8],keepflv[8],start[8],end[8],state[8],8,videoUrls.at(8));
     //nconcurrentdownloads--;
     //isdownloading[8] = 0;
 }
@@ -920,7 +905,7 @@ void Downloader::downloaddone10()
         reply10->deleteLater();
         reply10 = 0;
         state[9] = 4; //state means: cancelled
-        emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],state[9],9); //transmit parameters
+        emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],state[9],9,videoUrls.at(9)); //transmit parameters
         //nconcurrentdownloads--;
         //isdownloading[9] = 0;
         return;
@@ -935,7 +920,7 @@ void Downloader::downloaddone10()
         reply10 = 0;
         //nconcurrentdownloads--;
         //isdownloading[9] = 0;
-        emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],-1,9); //error is state = -1
+        emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],-1,9,videoUrls.at(9)); //error is state = -1
         return;
     }
     else if (!redirectionTarget.isNull())
@@ -948,14 +933,14 @@ void Downloader::downloaddone10()
      reply10 = 0;
      nconcurrentdownloads--;
      isdownloading[9] = 0;
-     DownloadtoFile(url.at(9),responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],state[9]); //state remains unchanged
+     DownloadtoFile(url.at(9),responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],state[9],videoUrls.at(9)); //state remains unchanged
      return;
     }
     //responseFile.removeAt(0);
     reply10->deleteLater();
     reply10 = 0;
     state[9] = state[9]+1; //state changed
-    emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],state[9],9);
+    emit dlfinit10(this,responseFile.at(9),video[9],cut[9],keepflv[9],start[9],end[9],state[9],9,videoUrls.at(9));
     //nconcurrentdownloads--;
     //isdownloading[9] = 0;
 }
@@ -1015,23 +1000,6 @@ void Downloader::decrement(int downloadslot)
     nconcurrentdownloads--;
     isdownloading[downloadslot] = 0;
 }
-
-/*
-// returns pointer to DownloadInfoBox of slot downloadslot if the state of DownloadInfoBox is not finished
-// usage: used to reuse DownloadInfoBox for the subsequent download and convert information publishing
-DownloadInfoBox* Downloader::getDownloadInfoBox(DownloadInfoBox* top,int downloadslot)
-{
-    while (top != NULL)
-    {
-        if ((top->slot == downloadslot) && (top->state != 3)) //state 3 means finished, if condition is true ==> reuse slot
-        {
-            return top;
-        }
-        top = top->previous;
-    }
-    return NULL;
-}
-*/
 
 void Downloader::cancelslot(int slot)
 {
