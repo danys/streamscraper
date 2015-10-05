@@ -37,6 +37,25 @@ Downloader::~Downloader()
 {
 }
 
+//Synchronously download a page associated to a given URL String
+QString Downloader::download(QString urlString)
+{
+    QNetworkAccessManager qnam;
+    QUrl url(urlString);
+    QEventLoop loop;
+    QNetworkReply* reply = qnam.get(QNetworkRequest(url));
+    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()), Qt::UniqueConnection);
+    loop.exec();
+    if (reply->error()) return NULL;
+    QVariant redirectionTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (!redirectionTarget.isNull())
+    {
+        QUrl newURL = url.resolved(redirectionTarget.toUrl());
+        return download(newURL.toString());
+    }
+    return QString::fromUtf8(reply->readAll());
+}
+
 int Downloader::getnextfreeslot()
 {
     for (int i=0;i<=maxdownloads-1;i++)

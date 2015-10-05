@@ -6,6 +6,9 @@
 #include <QFile>
 #include <QtNetwork>
 #include <QByteArray>
+#include <QNetworkAccessManager>
+#include <QEventLoop>
+#include <QNetworkReply>
 //#include "DownloadInfoBox.h"
 
 //This class is used to download a file from the internet to a file or a variable
@@ -60,6 +63,7 @@ class Downloader: public QObject
    int getnextfreeslot();
    //decrement download: used by external caller to decrement #concurrent downloads and free download slot synchronously
    void decrement(int downloadslot);
+   static QString download(QString urlString);
 
  private slots:
      // stop downloading
