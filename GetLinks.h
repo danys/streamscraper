@@ -24,6 +24,7 @@ class GetLinks
    QString unescape(QString linkdata);
    QString escape(QString linkdata);
    QString between(QString str,QString from,QString to);
+   QString decodeJSON(QString s);
 };
 
 

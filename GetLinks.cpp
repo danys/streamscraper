@@ -1,11 +1,13 @@
 #include <QWidget>
 #include "GetLinks.h"
+#include "Downloader.h"
 #include <QFile>
 #include <QUrl>
-#include <iostream> //debug
-#include <QJsonValue>
 #include <stdexcept>
 #include <QJSEngine>
+#include "SynchronousDownloader.h"
+#include <QRegularExpression>
+#include <QDebug>
 
 using namespace std;
 
@@ -240,7 +242,14 @@ QString idFromVideoUrl(QString videoUrl)
     QString truncatedStr = videoUrl.mid(windex);
     int ampind = truncatedStr.indexOf("&");
     if (ampind==-1) return truncatedStr;
-    return truncatedStr.left(ampindex);
+    return truncatedStr.left(ampind);
+}
+
+QString GetLinks::decodeJSON(QString s)
+{
+    s.replace("\"","");
+    s.replace("\\/","/");
+    return s;
 }
 
 //The main function of the class which parses the downloaded file for video links
@@ -307,78 +316,81 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title,
         else
         {
             //check if "s" can be found. The "s" value is encrypted
+            SynchronousDownloader downloader;
             QString encryptedSignature = between(currentItem,"s=","&");
             if ((!encryptedSignature.isNull()) && (!encryptedSignature.isEmpty()))
             {
                 //fetch the video webpage
-                QString videopage = Downloader::download(videoUrl);
+                QString videopage = downloader.download(videoUrl);
                 QString embedpage = "";
                 //Look for age gate regex in video page
-                QRegExp rxagegate("player-age-gate-content\">");
+                QRegularExpression rxagegate("player-age-gate-content\">");
                 bool agegate = false;
                 agegate = videopage.contains(rxagegate);
-                QRegExp rxAssets("\"assets\":.+?\"js\":\s*(\"[^\"]+\")");
+                QRegularExpression rxAssets("\"assets\":.+?\"js\":\\s*(\"[^\"]+\")");
                 QString playerUrlJson = "";
-                int matchi=-1;
+                QRegularExpressionMatch match;
                 if (agegate) //look in embed page if page is age-gated
                 {
                     QString embedpageurl = "https://www.youtube.com/embed/";
-                    embedpage = Donwloader::download(embedpageurl.append(idFromVideoUrl(videoUrl)));
+                    embedpage = downloader.download(embedpageurl.append(idFromVideoUrl(videoUrl)));
                     playerUrlJson = "";
-                    matchi = rxAssets.indexIn(embedpage);
+                    match = rxAssets.match(embedpage);
                 }
                 else //otherwise look in video page
                 {
-                    matchi = rxAssets.indexIn(videopage);
+                    match = rxAssets.match(videopage);
                 }
-                if (matchi!=-1)
+                if (match.hasMatch())
                 {
-                    playerUrlJson = rxAssets.cap(1);
+                    playerUrlJson = match.captured(1);
                 }
                 //Decode the Json encoded playerUrl
-                QJsonValue playerJsonVal(playerUrlJson);
-                QString playerUrl = playerJsonVal.toString();
+                QString playerUrl = decodeJSON(playerUrlJson);
                 if ((playerUrl.isNull()) || (playerUrl.isEmpty()))
                 {
-                    QRegExp rxYtPlayer("ytplayer\.config.*?\"url\"\s*:\s*(\"[^\"]+\")");
-                    matchi = rxAssets.indexIn(videopage);
-                    if (matchi!=-1)
+                    QRegularExpression rxYtPlayer("ytplayer\\.config.*?\"url\"\\s*:\\s*(\"[^\"]+\")");
+                    match = rxYtPlayer.match(videopage);
+                    if (match.hasMatch())
                     {
-                        playerUrlJson = rxYtPlayer.cap(1);
+                        playerUrlJson = match.captured(1);
                     }
-                    playerJsonVal(playerUrlJson);
-                    playerUrl = playerJsonVal.toString();
+                    playerUrl = decodeJSON(playerUrlJson);
                 }
                 //OK we have encryptedSignature, videoUrl (=> videoID), agegate, playerUrl
                 if (playerUrl.startsWith("//")) playerUrl.prepend("https:");
-                QRegExp rxPid(".*?-(?P<id>[a-zA-Z0-9_-]+)(?:/watch_as3|/html5player(?:-new)?)?\.(?P<ext>[a-z]+)$");
-                matchi = rxPid.indexIn(playerUrl);
+                QRegularExpression rxPid(".*?-(?P<id>[a-zA-Z0-9_-]+)(?:/watch_as3|/html5player(?:-new)?)?\\.(?P<ext>[a-z]+)$");
+                match = rxPid.match(playerUrl);
                 QString player_id, player_type;
-                if (matchi!=-1)
+                if (match.hasMatch())
                 {
-                    player_id = rxPid.cap(1);
-                    player_type = rxPid.cap(2);
+                    player_id = match.captured(1);
+                    player_type = match.captured(2);
                 }
-                QString playerCode = Downloader::download(playerUrl);
+                QString playerCode = downloader.download(playerUrl);
                 QString unencryptedSignature = "";
                 if (player_type.compare("js")==0)
                 {
-                    QRegExp rxJsFunc("\.sig\|\|([a-zA-Z0-9$]+)\(");
-                    matchi = rxPid.indexIn(playerCode);
-                    if (matchi!=-1)
+                    QRegularExpression rxJsFunc("\\.sig\\|\\|([a-zA-Z0-9$]+)\\(");
+                    match = rxJsFunc.match(playerCode);
+                    if (match.hasMatch())
                     {
-                        QString jsFuncName = rxJsFunc.cap(1);
+                        QString jsFuncName = match.captured(1);
                         //Invoke function with JS engine
-                        QJSEngine jsEngine();
+                        QJSEngine jsEngine;
                         jsEngine.evaluate(playerCode);
-                        QJSValue jsFunc = jsEngine.globalObject().property(jsFuncName);
-                        unencryptedSignature = jsFunc.call(QJSValueList() << encryptedSignature).toString();
+                        QJSValue jsFunc = jsEngine.globalObject().property(jsFuncName).call(QJSValueList() << encryptedSignature);
+                        unencryptedSignature = jsFunc.toString();
+                        qDebug() << "Unencrypted sig = " << unencryptedSignature << "\n";
                     }
                     else throw std::invalid_argument("Could not find JavaScript function!");
                 }
                 else if (player_type.compare("swf")==0)
                 {
-                    //
+                    /*swfi = SWFInterpreter(file_contents)
+        TARGET_CLASSNAME = 'SignatureDecipher'
+        searched_class = swfi.extract_class(TARGET_CLASSNAME)
+        initial_function = swfi.extract_function(searched_class, 'decipher')*/
                 }
                 else
                 {
