@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network qml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,7 +23,8 @@ SOURCES += main.cpp \
     LineEditButton.cpp \
     MP4AudioFile.cpp \
     Mp4tom4a.cpp \
-    yload.cpp
+    yload.cpp \
+    SynchronousDownloader.cpp
 
 HEADERS  += \
     AudioExtractor.h \
@@ -36,7 +37,8 @@ HEADERS  += \
     LineEditButton.h \
     MP4AudioFile.h \
     Mp4tom4a.h \
-    yload.h
+    yload.h \
+    SynchronousDownloader.h
 
 FORMS    += \
     yload.ui
