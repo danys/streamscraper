@@ -7,6 +7,7 @@
 #include <QJSEngine>
 #include "SynchronousDownloader.h"
 #include <QRegularExpression>
+#include <iostream>
 #include <QDebug>
 
 using namespace std;
@@ -252,6 +253,63 @@ QString GetLinks::decodeJSON(QString s)
     return s;
 }
 
+QString extractJSFunction(QString code, QString funcName)
+{
+    int startIndex = code.indexOf("function "+funcName);
+    if (startIndex==-1) return "";
+    int funcParenStartIndex = code.indexOf("(",startIndex+funcName);
+    if (funcParenStartIndex==-1) return "";
+    int funcParenStopIndex = code.indexOf(")",startIndex+funcName+1);
+    if (funcParenStopIndex==-1) return "";
+    int funcBracketStartIndex = code.indexOf("{",startIndex);
+    if (funcBracketStartIndex==-1) return "";
+    int iteratorIndex=funcBracketStartIndex;
+    int funcBracketStopIndex=-1;
+    int nOpenBrackets=1;
+    while(iteratorIndex<code.length())
+    {
+        if (code.at(iteratorIndex)==QChar('{')) nOpenBrackets++;
+        else if (code.at(iteratorIndex)==QChar('}'))
+        {
+            nOpenBrackets--;
+            if (nOpenBrackets==0)
+            {
+                funcBracketStopIndex = iteratorIndex;
+                break;
+            }
+        }
+        iteratorIndex++;
+    }
+    if (funcBracketStopIndex==-1) return "";
+    QString res = code.mid(startIndex);
+    res.truncate(funcBracketStopIndex-startIndex+1);
+    //Collect names of function arguments
+    QString argumentStr = code.mid(funcParenStartIndex+1);
+    argumentStr.truncate(functParentStopIndex-funcParenStartIndex-1);
+    QStringList argList = argumentStr.split(",");
+    //Split function body into commands
+    QString body = code.mid(funcBracketStartIndex+1);
+    body.truncate(funcBracketStopIndex-funcBracketStartIndex-1);
+    QStringList bodyCommandList = body.split(";");
+    QString command;
+    for(int i=0;i<bodyCommandList.size();i++)
+    {
+        command = bodyCommandList.at(i);
+        if (command.contains("="))
+        {
+            command.split("=");
+            //save left side variable
+            //put right side variable in search list
+        }
+    }
+    return res;
+}
+
+QString extractEssentialJSCode(QString code, QString funcName)
+{
+    //
+}
+
 //The main function of the class which parses the downloaded file for video links
 void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title, QString videoUrl)
 {
@@ -318,6 +376,7 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title,
             //check if "s" can be found. The "s" value is encrypted
             SynchronousDownloader downloader;
             QString encryptedSignature = between(currentItem,"s=","&");
+            qDebug() << "Encrypted sig = " << encryptedSignature;
             if ((!encryptedSignature.isNull()) && (!encryptedSignature.isEmpty()))
             {
                 //fetch the video webpage
@@ -378,7 +437,7 @@ void GetLinks::extractlinks(QString file, QList<QString> &links, QString &title,
                         QString jsFuncName = match.captured(1);
                         //Invoke function with JS engine
                         QJSEngine jsEngine;
-                        jsEngine.evaluate(playerCode);
+                        jsEngine.evaluate(extractEssentialJSCode(playerCode,jsFuncName));
                         QJSValue jsFunc = jsEngine.globalObject().property(jsFuncName).call(QJSValueList() << encryptedSignature);
                         unencryptedSignature = jsFunc.toString();
                         qDebug() << "Unencrypted sig = " << unencryptedSignature << "\n";
