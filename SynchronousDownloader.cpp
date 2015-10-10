@@ -53,5 +53,5 @@ void SynchronousDownloader::slotSslErrors(QList<QSslError> list)
 
 void SynchronousDownloader::bytesReady()
 {
-    downloadBuffer.append(QString::fromUtf8(response->readAll()));
+    downloadBuffer.append(response->readAll());
 }
