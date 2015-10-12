@@ -46,7 +46,7 @@ void SynchronousDownloader::slotSslErrors(QList<QSslError> list)
     for(int i=0;i<list.size();i++)
     {
         QSslError error = list.at(i);
-        qDebug() << error.errorString() << "\n";
+        //qDebug() << error.errorString() << "\n";
     }
     response->ignoreSslErrors(list);
 }
